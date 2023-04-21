@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelodyLax Media Player</title>
+    <link rel="stylesheet" href="playerstyles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="logo.png" alt="MelodyLax Logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="mood.html">MyMood</a></li>
+                <li><a href="contactUs.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="media-player">
+            <h2>Now Playing</h2>
+            <div class="album-art">
+                <div class="song-info">
+                    <h3 class="song-title">Heatwaves</h3>
+                    <p class="artist-name">Glass Animals</p>
+                </div>
+                <img src="pic.png" alt="Heat Waves -Glass Animals">
+            </div>
+            <div class="player-controls">
+                <button class="control-btn" id="previous">&#171;</button>
+                <button class="control-btn" id="play-pause">&#10074;&#10074;</button>
+                <button class="control-btn" id="next">&#187;</button>
+            </div>
+            <div class="progress-bar-container">
+                <input type="range" min="0" max="100" value="0" class="progress-bar" id="progress-bar">
+            </div>
+            <div class="like-container">
+                <button class="like-btn" id="like">&#9829;</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy;MelodyLax. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const audio = new Audio('HeatWaves.mp3');
+        const playPauseButton = document.getElementById('play-pause');
+        const progressBar = document.getElementById('progress-bar');
+        const likeButton = document.getElementById('like');
+        const likeList = JSON.parse(localStorage.getItem('likeList')) || [];
+        const nextButton = document.getElementById('next');
+        const previousButton = document.getElementById('previous');
+        const albumArt = document.querySelector('.album-art img');
+        const songTitle = document.querySelector('.song-title');
+        const artistName = document.querySelector('.artist-name');
+
+        const playlist = [
+    {
+        title: "Heatwaves",
+        artist: "Glass Animals",
+        cover: "pic.png",
+        file: "Heatwaves.mp3"
+    },
+    {
+        title: "Die For You (Remix)",
+        artist: "The Weeknd & Ariana Grande",
+        cover: "pic4.jpg",
+        file: "DieForYouRemix.mp3"
+    },
+    {
+        title: "Thank you, next",
+        artist: "Ariana Grande",
+        cover: "pic2.png",
+        file: "ThankYouNext.mp3"
+    },
+    {
+        title: 'Stay With Me',
+        artist: 'Sam Smith',
+        cover: 'pic5.png',
+        file: 'StayWithMe.mp3',
+    },
+    {
+        title: 'River Flows In You',
+        artist: 'Yiruma',
+        cover: 'pic6.jpg',
+        file: 'RiverFlowsInYou.mp3',
+    },
+    {
+        title: 'Hallelujah',
+        artist: 'Pentatonix',
+        cover: 'pic7.jpg',
+        file: 'Hallelujah.mp3',
+    },
+];
+    let currentSongIndex = getSongIndexFromUrl() || 0;
+    loadSong(currentSongIndex);
+    function loadSong(index) {
+    albumArt.src = playlist[index].cover;
+    audio.src = playlist[index].file;
+    songTitle.innerText = playlist[index].title;
+    artistName.innerText = playlist[index].artist;
+    }
+
+    function getSongIndexFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return parseInt(urlParams.get('songIndex'), 10);
+    }   
+
+    function togglePlayPause() {
+        if (audio.paused) {
+            audio.play();
+            playPauseButton.innerHTML = '&#10074;&#10074;'; // Change to pause button
+        } else {
+            audio.pause();
+            playPauseButton.innerHTML = '&#9658;'; // Change to play button
+        }
+    }
+
+    
+    function updateProgressBar() {
+        progressBar.value = (audio.currentTime / audio.duration) * 100;
+    }
+
+    function setAudioProgress() {
+        audio.currentTime = (progressBar.value / 100) * audio.duration;
+    }
+
+    function playPreviousSong() {
+        currentSongIndex--;
+        if (currentSongIndex < 0) {
+            currentSongIndex = playlist.length - 1;
+        }
+        loadSong(currentSongIndex);
+        audio.play();
+    }
+
+    function playNextSong() {
+        currentSongIndex++;
+        if (currentSongIndex >= playlist.length) {
+            currentSongIndex = 0;
+        }
+        loadSong(currentSongIndex);
+        audio.play();
+    }
+
+    function addSongToLikeList() {
+        const song = playlist[currentSongIndex];
+        const likeList = JSON.parse(localStorage.getItem('likeList')) || [];
+        likeList.push(song);
+        localStorage.setItem('likeList', JSON.stringify(likeList));
+        likeButton.style.color = 'red';
+    }
+
+   
+
+    audio.addEventListener('timeupdate', updateProgressBar);
+    playPauseButton.addEventListener('click', togglePlayPause);
+    progressBar.addEventListener('input', setAudioProgress);
+    likeButton.addEventListener('click', addSongToLikeList);
+    nextButton.addEventListener('click', playNextSong);
+    previousButton.addEventListener('click', playPreviousSong);
+
+    </script>
+</body>
+</html>
