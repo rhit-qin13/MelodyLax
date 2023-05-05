@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelodyLax Mood Selection</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="logo.png" alt="MelodyLax Logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html">Account</a></li>
+                <li><a href="contactUs.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="mood-selection">
+            <h2>Select Your Mood To Start</h2>
+            <div class="emoji-container">
+                <span class="emoji" data-mood="happy" role="button">&#x1F601;</span>
+                <span class="emoji" data-mood="sad" role="button">&#x1F622;</span>
+                <span class="emoji" data-mood="energetic" role="button">&#x1F4AA;</span>
+                <span class="emoji" data-mood="relaxed" role="button">&#x1F60C;</span>
+            </div>
+            <button class="cta" id="get-recommendations" disabled>Get Recommendations</button> 
+            <a href="player.html">
+                <button class="cta">Start Playing Recommended Songs</button> </a>
+        </section>
+        <section id="chat-container">
+            <div id="chat-messages"></div>
+            <form id="chat-form">
+              <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+              <a> <button type="submit">Send</button> </a>
+            </form>
+          </section>
+          
+    </main>
+    <footer class="footer">
+        <p>&copy;MelodyLax. All rights reserved.</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/openai@0.28.0/umd/openai.browser.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+  const emojis = document.querySelectorAll('.emoji');
+  const getRecommendationsButton = document.getElementById('get-recommendations');
+  const chatForm = document.getElementById('chat-form');
+  const chatMessages = document.getElementById('chat-messages');
+
+  emojis.forEach(emoji => {
+    emoji.addEventListener('click', () => {
+      emojis.forEach(e => e.classList.remove('selected'));
+      emoji.classList.add('selected');
+      getRecommendationsButton.disabled = false;
+    });
+  });
+
+  function getSelectedMood() {
+    const selectedEmoji = document.querySelector('.emoji.selected');
+    return selectedEmoji ? selectedEmoji.dataset.mood : null;
+  }
+
+  getRecommendationsButton.addEventListener('click', async () => {
+    const selectedMood = getSelectedMood();
+
+    if (selectedMood) {
+      appendChatMessage(`Mood selected: ${selectedMood}`);
+
+      const recommendations = await fetchSongRecommendations(selectedMood);
+      if (recommendations) {
+        appendChatMessage('Here are the recommended songs:');
+        recommendations.forEach(song => {
+          appendChatMessage(`${song.index}. ${song.title} by ${song.artist}`);
+        });
+      } else {
+        appendChatMessage('Sorry, I could not fetch song recommendations at the moment. Please try again later.');
+      }
+    }
+  });
+
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+  });
+
+  function appendChatMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  async function fetchSongRecommendations(mood) {
+    const prompt = `hey gpt, you are now a music recommendation assistant. I need you to recommend 10 songs based on the mood input: now the user is ${mood}. Only provide the index, song name, and singer.`;
+
+    try {
+      const response = await openai.Completion.create({
+        engine: 'gpt-3.5-turbo',
+        prompt: prompt,
+        max_tokens: 150,
+        n: 1,
+        stop: null,
+        temperature: 0.7,
+      });
+
+      return parseRecommendations(response.choices[0].text);
+    } catch (error) {
+      console.error('Error fetching song recommendations:', error);
+      return null;
+    }
+  }
+
+  function parseRecommendations(recommendationsText) {
+    const recommendedSongs = recommendationsText
+      .trim()
+      .split('\n')
+      .map(line => {
+        const [index, title, artist] = line.split(',');
+        return { index: parseInt(index), title, artist };
+      });
+
+    return recommendedSongs;
+  }
+});
+
+    </script>
+</body>
+</html>
