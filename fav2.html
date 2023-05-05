@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelodyLax Favorite Music</title>
+    <link rel="stylesheet" href="favstyles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="logo.png" alt="MelodyLax Logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="mood.html">MyMood</a></li>
+                <li><a href="contactUs.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="favorite-music">
+            <h2>My Favorite Music When Sad</h2>
+            <ul class="music-list">
+                <li class="music-item">
+                    <div class="album-cover">
+                        <a href="player.html?songIndex=3"><img src="pic5.png" alt="Stay With Me"></a>
+                    </div>
+                    <div class="music-info">
+                        <h3>Stay With Me</h3>
+                        <p>Sam Smith</p>
+                    </div>
+                </li>
+                <!-- Add more music items as needed -->
+            </ul>
+            <ul class="music-list">
+                <li class="music-item">
+                    <div class="album-cover">
+                        <a href="player.html?songIndex=4"><img src="pic6.jpg" alt="River Flows In You"></a>
+                    </div>
+                    <div class="music-info">
+                        <h3>River Flows In You</h3>
+                        <p>Yiruma</p>
+                    </div>
+                </li>
+                <!-- Add more music items as needed -->
+            </ul>
+            <ul class="music-list">
+                <li class="music-item">
+                    <div class="album-cover">
+                        <a href="player.html?songIndex=5"><img src="pic7.jpg" alt="Hallelujah"></a>
+                    </div>
+                    <div class="music-info">
+                        <h3>Hallelujah</h3>
+                        <p>Pentatonix</p>
+                    </div>
+                </li>
+                <!-- Add more music items as needed -->
+            </ul>
+            <div class="button-container">
+                <a href="player.html">
+                    <button class="start-recommended-songs">Start Playing Recommended Songs</button> </a>
+              </div>
+        </section>
+    </main>
+    
+
+    <footer class="footer">
+        <p>&copy;MelodyLax. All rights reserved.</p>
+    </footer>
+    <script>
+        const recommendButton = document.getElementById('recommend-btn');
+    
+    recommendButton.addEventListener('click', async function () {
+      const userMood = 'sad'; // Replace this with the actual user input for mood
+      const recommendations = await getSongRecommendations(userMood);
+    
+      // Parse the recommendations into an array of song objects
+      const recommendedSongs = parseRecommendations(recommendations);
+    
+      // Play the recommended songs
+      playRecommendedSongs(recommendedSongs);
+    });
+    
+    </script>
+</body>
+</html>
